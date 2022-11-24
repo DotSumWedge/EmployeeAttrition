@@ -1,0 +1,101 @@
+---
+title: "AttritionByJobTitle"
+author: "Derek Rogers"
+date: "2022-11-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Loading Data From S3 URL Using RCurl
+```{r}
+library("RCurl") 
+library(jsonlite)
+library(ggplot2)
+library(class)
+library(caret)
+library(e1071)
+library(dplyr)
+library(tidyverse)
+library(aws.s3)
+library(gtools)
+
+creativity <- read.table(textConnection(getURL(
+  "https://smuds6306.s3.us-east-2.amazonaws.com/Creativity.csv"
+)), sep=",", header=TRUE)
+
+iris3 <- jsonlite::fromJSON("https://smuds6306.s3.us-east-2.amazonaws.com/iris.json")
+
+climate <- read.table(textConnection(getURL(
+  "https://cgiardata.s3-us-west-2.amazonaws.com/ccafs/amzn.csv"
+)), sep=",", header=TRUE)
+```
+           
+```{r}
+Sys.setenv("AWS_ACCESS_KEY_ID" = "AKIAVW4VHW4VPB7MHZWA",
+           "AWS_SECRET_ACCESS_KEY" = "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",
+           "AWS_DEFAULT_REGION" = "us-east-2")
+```
+
+```{r}
+# Using aws.s3
+aws.s3::bucketlist()
+aws.s3::get_bucket("smuddsproject2")
+
+#Read in Creativity.csv
+turnoverDataframe = s3read_using(FUN = read.csv,
+                    bucket = "smuddsproject2",
+                    object = "CaseStudy2-data.csv")
+
+noAttritionTurnoverDataframe = s3read_using(FUN = read.csv,
+                    bucket = "smuddsproject2",
+                    object = "CaseStudy2CompSet No Attrition.csv")
+
+turnoverDataframe$Attrition = as.factor(turnoverDataframe$Attrition)
+turnoverDataframe$Gender = ifelse(turnoverDataframe$Gender=="Female",1,0)
+turnoverDataframe
+```
+
+```{r}
+# Remove columns with no unique values: Over18, EmployeeCount, StandardHours
+# Remove employee number as it is only used as a unique identifier and not useful for attrition analysis
+dropColumns = c("Over18", "StandardHours", "EmployeeCount", "EmployeeNumber")
+turnoverDataframe = turnoverDataframe[ , !(names(turnoverDataframe) %in% dropColumns)]
+```
+
+```{r}
+turnoverDataframe
+```
+
+```{r}
+apply(turnoverDataframe, 2, function(x) length(unique(x)))
+```
+
+```{r}
+#Look at Department and JobRole
+
+turnoverDataframe$Department
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```

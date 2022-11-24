@@ -1,0 +1,164 @@
+---
+title: "Free_Dough_Lay"
+author: "Derek Rogers"
+date: "2022-11-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Loading Data From S3 URL Using RCurl
+```{r}
+library("RCurl") 
+library(jsonlite)
+library(ggplot2)
+library(class)
+library(caret)
+library(e1071)
+library(dplyr)
+library(tidyverse)
+library(aws.s3)
+library(gtools)
+
+creativity <- read.table(textConnection(getURL(
+  "https://smuds6306.s3.us-east-2.amazonaws.com/Creativity.csv"
+)), sep=",", header=TRUE)
+
+iris3 <- jsonlite::fromJSON("https://smuds6306.s3.us-east-2.amazonaws.com/iris.json")
+
+climate <- read.table(textConnection(getURL(
+  "https://cgiardata.s3-us-west-2.amazonaws.com/ccafs/amzn.csv"
+)), sep=",", header=TRUE)
+```
+           
+```{r}
+Sys.setenv("AWS_ACCESS_KEY_ID" = "AKIAVW4VHW4VPB7MHZWA",
+           "AWS_SECRET_ACCESS_KEY" = "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",
+           "AWS_DEFAULT_REGION" = "us-east-2")
+```
+
+```{r}
+# Using aws.s3
+aws.s3::bucketlist()
+aws.s3::get_bucket("smuddsproject2")
+
+#Read in Creativity.csv
+turnoverDataframe = s3read_using(FUN = read.csv,
+                    bucket = "smuddsproject2",
+                    object = "CaseStudy2-data.csv")
+
+noAttritionTurnoverDataframe = s3read_using(FUN = read.csv,
+                    bucket = "smuddsproject2",
+                    object = "CaseStudy2CompSet No Attrition.csv")
+
+turnoverDataframe$Attrition = as.factor(turnoverDataframe$Attrition)
+```
+
+```{r}
+# Remove columns with no unique values: Over18, EmployeeCount, StandardHours
+# Remove employee number as it is only used as a unique identifier and not useful for attrition analysis
+dropColumns = c("Over18", "StandardHours", "EmployeeCount", "EmployeeNumber")
+turnoverDataframe = turnoverDataframe[ , !(names(turnoverDataframe) %in% dropColumns)]
+```
+
+```{r}
+# Reorder so Attrition is the first column, ID is the second column, and Age is the 3rd column
+# Only keep numeric columns
+turnoverDataframe = turnoverDataframe[,c(3,1,2,5,7,8,10,12,13,14,16,18,19,20,22,23,24,25,26,27,28,29,30,31,32)]
+
+apply(turnoverDataframe, 2, function(x) length(unique(x)))
+ncol(turnoverDataframe)
+```
+
+```{r}
+ncol(turnoverDataframe)
+turnoverDataframe$LogMonthlyIncome = log(turnoverDataframe$MonthlyIncome)
+turnoverDataframe
+```
+
+```{r}
+maxKvalue = 5
+
+columnCombinations = c(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26)
+#columnCombinations = c(3,4,5,6)
+
+for(i in 1:length(columnCombinations)){
+  resultsDataframe = data.frame(accuracy = double(), specificity = double(), kValue = integer(), combination = character())
+  columnCombinationsMatrix = combn(columnCombinations, i)
+  for(j in 1:ncol(columnCombinationsMatrix)){
+    for(k in 1:maxKvalue){
+      classifications = knn.cv(turnoverDataframe[,columnCombinationsMatrix[,j]], turnoverDataframe$Attrition, k=k, prob = TRUE)
+      resultsDataframe[nrow(resultsDataframe) + 1,] = c(confusionMatrix(table(classifications, turnoverDataframe$Attrition))$overall[1], confusionMatrix(table(classifications, turnoverDataframe$Attrition))$byClass[2], k, paste(columnCombinationsMatrix[,j], collapse = " "))
+    }
+  }
+  fileLocation = paste("C:/SMU MS Data Science/DoingDataScience6306/FinalProject/KnnResults/Combinations2/Results", i, ".csv", sep="")
+  write.csv(resultsDataframe, fileLocation, row.names = TRUE)
+}
+
+resultsDataframe
+```
+
+```{r}
+#Todo: randomly take out 590 instances where attrition is No and run 30 iterations of random seeds for each model.
+
+maxKvalue = 5
+
+columnCombinations = c(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26)
+#columnCombinations = c(3,4,5,6)
+
+for(i in 1:length(columnCombinations)){
+  resultsDataframe = data.frame(accuracy = double(), specificity = double(), kValue = integer(), combination = character())
+  columnCombinationsMatrix = combn(columnCombinations, i)
+  for(j in 1:ncol(columnCombinationsMatrix)){
+    for(k in 1:maxKvalue){
+      classifications = knn.cv(turnoverDataframe[,columnCombinationsMatrix[,j]], turnoverDataframe$Attrition, k=k, prob = TRUE)
+      resultsDataframe[nrow(resultsDataframe) + 1,] = c(confusionMatrix(table(classifications, turnoverDataframe$Attrition))$overall[1], confusionMatrix(table(classifications, turnoverDataframe$Attrition))$byClass[2], k, paste(columnCombinationsMatrix[,j], collapse = " "))
+    }
+  }
+  fileLocation = paste("C:/SMU MS Data Science/DoingDataScience6306/FinalProject/KnnResults/Combinations2/Results", i, ".csv", sep="")
+  write.csv(resultsDataframe, fileLocation, row.names = TRUE)
+}
+
+resultsDataframe
+```
+
+```{r}
+knn_results = knn(turnoverDataframe[,c(3,5)], noAttritionTurnoverDataframe[,c(2,6)], turnoverDataframe$Attrition, k=3)
+DF$PredictedAttrition = knn_results
+```
+
+```{r}
+
+```
+
+
+
+```{r}
+noAttritionTurnoverDataframe
+```
+
+```{r}
+table(turnoverDataframe$Attrition)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
