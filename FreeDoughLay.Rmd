@@ -75,7 +75,12 @@ ncol(turnoverDataframe)
 ```{r}
 ncol(turnoverDataframe)
 turnoverDataframe$LogMonthlyIncome = log(turnoverDataframe$MonthlyIncome)
-turnoverDataframe
+
+yesAttritionDataframe = subset(turnoverDataframe, Attrition=="Yes")
+noAttritionDataframe = subset(turnoverDataframe, Attrition=="No")
+
+yesAttritionDataframe
+noAttritionDataframe
 ```
 
 ```{r}
@@ -93,7 +98,7 @@ for(i in 1:length(columnCombinations)){
       resultsDataframe[nrow(resultsDataframe) + 1,] = c(confusionMatrix(table(classifications, turnoverDataframe$Attrition))$overall[1], confusionMatrix(table(classifications, turnoverDataframe$Attrition))$byClass[2], k, paste(columnCombinationsMatrix[,j], collapse = " "))
     }
   }
-  fileLocation = paste("C:/SMU MS Data Science/DoingDataScience6306/FinalProject/KnnResults/Combinations2/Results", i, ".csv", sep="")
+  fileLocation = paste("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Results", i, ".csv", sep="")
   write.csv(resultsDataframe, fileLocation, row.names = TRUE)
 }
 
@@ -104,21 +109,29 @@ resultsDataframe
 #Todo: randomly take out 590 instances where attrition is No and run 30 iterations of random seeds for each model.
 
 maxKvalue = 5
+iterations = 25
 
-columnCombinations = c(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26)
-#columnCombinations = c(3,4,5,6)
+#columnCombinations = c(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26)
+columnCombinations = c(3,4,5,6)
 
-for(i in 1:length(columnCombinations)){
+for(i in 1:2){
+#for(i in 1:length(columnCombinations)){
   resultsDataframe = data.frame(accuracy = double(), specificity = double(), kValue = integer(), combination = character())
   columnCombinationsMatrix = combn(columnCombinations, i)
   for(j in 1:ncol(columnCombinationsMatrix)){
     for(k in 1:maxKvalue){
-      classifications = knn.cv(turnoverDataframe[,columnCombinationsMatrix[,j]], turnoverDataframe$Attrition, k=k, prob = TRUE)
-      resultsDataframe[nrow(resultsDataframe) + 1,] = c(confusionMatrix(table(classifications, turnoverDataframe$Attrition))$overall[1], confusionMatrix(table(classifications, turnoverDataframe$Attrition))$byClass[2], k, paste(columnCombinationsMatrix[,j], collapse = " "))
+      for(l in 1:iterations){
+        #Combine the yesAttritionDataframe with a subset of the noAttritionDataframe so that the length of the noAttritionDataframe 
+          #matches the length of the yesAttritionDataframe(140 each, 280 in total)
+        #yesAttritionDataframe
+        #noAttritionDataframe
+        classifications = knn.cv(turnoverDataframe[,columnCombinationsMatrix[,j]], turnoverDataframe$Attrition, k=k, prob = TRUE)
+        resultsDataframe[nrow(resultsDataframe) + 1,] = c(confusionMatrix(table(classifications, turnoverDataframe$Attrition))$overall[1], confusionMatrix(table(classifications, turnoverDataframe$Attrition))$byClass[2], k, paste(columnCombinationsMatrix[,j], collapse = " "))
+      }
     }
   }
   fileLocation = paste("C:/SMU MS Data Science/DoingDataScience6306/FinalProject/KnnResults/Combinations2/Results", i, ".csv", sep="")
-  write.csv(resultsDataframe, fileLocation, row.names = TRUE)
+  #write.csv(resultsDataframe, fileLocation, row.names = TRUE)
 }
 
 resultsDataframe
@@ -136,15 +149,19 @@ DF$PredictedAttrition = knn_results
 
 
 ```{r}
-noAttritionTurnoverDataframe
+noAttritionDataframe
 ```
 
 ```{r}
 table(turnoverDataframe$Attrition)
+table(turnoverDataframe$Attrition)[1]
 ```
 
 ```{r}
-
+trainingPercent = table(turnoverDataframe$Attrition)[2] / table(turnoverDataframe$Attrition)[1]
+trainingIndicies = sample(1:dim(noAttritionDataframe)[1], round(trainingPercent * dim(noAttritionDataframe)[1]))
+noAttritionTrainingDataframe = noAttritionDataframe[trainingIndicies,]
+noAttritionTrainingDataframe
 ```
 
 ```{r}
