@@ -1,0 +1,95 @@
+---
+title: "ModelAnalysis"
+author: "Derek Rogers"
+date: "2022-11-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+knnResults2 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Combinations2/Results2.csv"))
+knnResults3 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Combinations2/Results3.csv"))
+knnResults4 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Combinations2/Results4.csv"))
+knnResults5 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Combinations2/Results5.csv"))
+```
+
+```{r}
+naiveBayesResults2 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/NaiveBayesResults/Combinations1/Results2.csv"))
+naiveBayesResults3 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/NaiveBayesResults/Combinations1/Results3.csv"))
+naiveBayesResults4 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/NaiveBayesResults/Combinations1/Results4.csv"))
+```
+
+```{r}
+# 9 - JobInvolvement
+# 18 - StockOptionLevel
+```
+
+```{r}
+knnResults2$meanAccuracySpecificity = (knnResults2$accuracy + knnResults2$specificity) / 2
+knnResults2$knnCombinationSize = 2
+
+knnResults3$meanAccuracySpecificity = (knnResults3$accuracy + knnResults3$specificity) / 2
+knnResults3$knnCombinationSize = 3
+
+knnResults4$meanAccuracySpecificity = (knnResults4$accuracy + knnResults4$specificity) / 2
+knnResults4$knnCombinationSize = 4
+
+knnResults5$meanAccuracySpecificity = (knnResults5$accuracy + knnResults5$specificity) / 2
+knnResults5$knnCombinationSize = 5
+
+#Print out best mean accuracy for all Knn results
+knnResults2[order(-knnResults2$meanAccuracySpecificity),]
+knnResults3[order(-knnResults3$meanAccuracySpecificity),]
+knnResults4[order(-knnResults4$meanAccuracySpecificity),]
+knnResults5[order(-knnResults5$meanAccuracySpecificity),]
+```
+
+```{r}
+naiveBayesResults2$meanAccuracySpecificity = (naiveBayesResults2$accuracy + naiveBayesResults2$specificity) / 2
+naiveBayesResults2$knnCombinationSize = 2
+
+naiveBayesResults3$meanAccuracySpecificity = (naiveBayesResults3$accuracy + naiveBayesResults3$specificity) / 2
+naiveBayesResults3$knnCombinationSize = 3
+
+naiveBayesResults4$meanAccuracySpecificity = (naiveBayesResults4$accuracy + naiveBayesResults4$specificity) / 2
+naiveBayesResults4$knnCombinationSize = 4
+
+naiveBayesResults2[order(-naiveBayesResults2$meanAccuracySpecificity),]
+naiveBayesResults3[order(-naiveBayesResults3$meanAccuracySpecificity),]
+naiveBayesResults4[order(-naiveBayesResults4$meanAccuracySpecificity),]
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```

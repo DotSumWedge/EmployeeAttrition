@@ -49,7 +49,7 @@ turnoverDataframe = s3read_using(FUN = read.csv,
                     bucket = "smuddsproject2",
                     object = "CaseStudy2-data.csv")
 
-noAttritionTurnoverDataframe = s3read_using(FUN = read.csv,
+testAttritionTurnoverDataframe = s3read_using(FUN = read.csv,
                     bucket = "smuddsproject2",
                     object = "CaseStudy2CompSet No Attrition.csv")
 
@@ -79,31 +79,92 @@ turnoverDataframe
 ```
 
 ```{r}
-trainIndices = sample(seq(1:length(turnoverDataframe$Attrition)),round(.7*length(turnoverDataframe$Attrition)))
-trainTurnover = turnoverDataframe[trainIndices,]
-testTurnover = turnoverDataframe[-trainIndices,]
+trainingPercent = numberOfYesObservations / numberOfNoObservations
 
-model = naiveBayes(trainTurnover[, c(3, 5, 6)], trainTurnover$Attrition, laplace = 1)
-confusionMatrix(table(predict(model, testTurnover[, c(3, 5, 6)]), testTurnover$Attrition))
+#Seperate the yes/no attrition observations into 2 dataframes
+noAttritionTrainingDataframe = turnoverDataframe[turnoverDataframe$Attrition == 'No',]
+yesAttritionTrainingDataframe = turnoverDataframe[turnoverDataframe$Attrition == 'Yes',]
 
-"train indicices:"
-trainIndices
-"training set:"
-trainTurnover
-"testing set:"
-testTurnover
+trainingIndicies = sample(1:dim(noAttritionTrainingDataframe)[1], round(trainingPercent * dim(noAttritionTrainingDataframe)[1]))
+trainingDataSet = rbind(noAttritionTrainingDataframe[trainingIndicies,], yesAttritionTrainingDataframe)
+
+model = naiveBayes(trainingDataSet[, c(3, 5, 6)], trainingDataSet$Attrition, laplace = 1)
+confusionMatrix(table(predict(model, turnoverDataframe[, c(3, 5, 6)]), turnoverDataframe$Attrition))
 ```
 
 ```{r}
+trainingPercent = numberOfYesObservations / numberOfNoObservations
 
+#Seperate the yes/no attrition observations into 2 dataframes
+noAttritionTrainingDataframe = turnoverDataframe[turnoverDataframe$Attrition == 'No',]
+yesAttritionTrainingDataframe = turnoverDataframe[turnoverDataframe$Attrition == 'Yes',]
+
+iterations = 25
+
+columnCombinations = c(3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,23,24,25,26)
+#columnCombinations = c(3,4,5,6)
+
+for(i in 2:length(columnCombinations)){
+  resultsDataframe = data.frame(accuracy = double(), specificity = double(), combination = character())
+  columnCombinationsMatrix = combn(columnCombinations, i)
+  for(j in 1:ncol(columnCombinationsMatrix)){
+    iterationResultsDataframe = data.frame(accuracy = double(), specificity = double(), combination = character())
+    for(l in 1:iterations){
+      # TODO: figure out how to test on the full dataset instead of the trainingDataSet
+      # https://stackoverflow.com/questions/66004740/how-to-apply-knn-model-on-the-test-dataset-after-cross-validation-in-r
+      
+      trainingIndicies = sample(1:dim(noAttritionTrainingDataframe)[1], round(trainingPercent * dim(noAttritionTrainingDataframe)[1]))
+      trainingDataSet = rbind(noAttritionTrainingDataframe[trainingIndicies,], yesAttritionTrainingDataframe)
+      
+      model = naiveBayes(trainingDataSet[, columnCombinationsMatrix[,j]], trainingDataSet$Attrition, laplace = 1)
+      iterationResultsDataframe[nrow(iterationResultsDataframe) + 1,] = c(confusionMatrix(table(predict(model, turnoverDataframe[, columnCombinationsMatrix[,j]]), turnoverDataframe$Attrition))$overall[1], confusionMatrix(table(predict(model, turnoverDataframe[, columnCombinationsMatrix[,j]]), turnoverDataframe$Attrition))$byClass[2], paste(columnCombinationsMatrix[,j], collapse = " "))
+    }
+    # Pass the mean accuracy/specificity from the iterationResultsDataframe into resultsDataframe
+    resultsDataframe[nrow(resultsDataframe) + 1,] = c(mean(as.numeric(iterationResultsDataframe$accuracy)), mean(as.numeric(iterationResultsDataframe$specificity)), paste(columnCombinationsMatrix[,j], collapse = " "))
+  }
+  fileLocation = paste("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/NaiveBayesResults/Combinations1/Results", i, ".csv", sep="")
+  write.csv(resultsDataframe, fileLocation, row.names = TRUE)
+}
+
+resultsDataframe
 ```
 
 ```{r}
-
+model = naiveBayes(trainingDataSet[, columnCombinationsMatrix[,j]], trainingDataSet$Attrition, laplace = 1)
+confusionMatrix(table(predict(model, turnoverDataframe[, columnCombinationsMatrix[,j]]), turnoverDataframe$Attrition))
 ```
 
 ```{r}
+confusionMatrix(table(predict(model, turnoverDataframe[, c(3, 5, 6)]), turnoverDataframe$Attrition))$overall[1]
+confusionMatrix(table(predict(model, turnoverDataframe[, c(3, 5, 6)]), turnoverDataframe$Attrition))$byClass[2]
+```
 
+```{r}
+trainingPercent = numberOfYesObservations / numberOfNoObservations
+
+#Seperate the yes/no attrition observations into 2 dataframes
+noAttritionTrainingDataframe = turnoverDataframe[turnoverDataframe$Attrition == 'No',]
+yesAttritionTrainingDataframe = turnoverDataframe[turnoverDataframe$Attrition == 'Yes',]
+
+iterations = 25
+
+columnCombinations = c(3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,23,24,25,26)
+
+iterationResultsDataframe = data.frame(accuracy = double(), specificity = double(), combination = character())
+for(l in 1:iterations){
+  # TODO: figure out how to test on the full dataset instead of the trainingDataSet
+  # https://stackoverflow.com/questions/66004740/how-to-apply-knn-model-on-the-test-dataset-after-cross-validation-in-r
+  
+  trainingIndicies = sample(1:dim(noAttritionTrainingDataframe)[1], round(trainingPercent * dim(noAttritionTrainingDataframe)[1]))
+  trainingDataSet = rbind(noAttritionTrainingDataframe[trainingIndicies,], yesAttritionTrainingDataframe)
+  
+  model = naiveBayes(trainingDataSet[, c(3, 5, 6)], trainingDataSet$Attrition, laplace = 1)
+  iterationResultsDataframe[nrow(iterationResultsDataframe) + 1,] = c(confusionMatrix(table(predict(model, trainingDataSet[, c(3, 5, 6)]), trainingDataSet$Attrition))$overall[1], confusionMatrix(table(predict(model, trainingDataSet[, c(3, 5, 6)]), trainingDataSet$Attrition))$byClass[2], paste(c(3, 5, 6), collapse = " "))
+}
+# Pass the mean accuracy/specificity from the iterationResultsDataframe into resultsDataframe
+resultsDataframe[nrow(resultsDataframe) + 1,] = c(mean(as.numeric(iterationResultsDataframe$accuracy)), mean(as.numeric(iterationResultsDataframe$specificity)), paste(columnCombinationsMatrix[,j], collapse = " "))
+
+resultsDataframe
 ```
 
 ```{r}

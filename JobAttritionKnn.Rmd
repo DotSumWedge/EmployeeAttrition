@@ -111,7 +111,7 @@ for(i in 1:length(columnCombinations)){
       resultsDataframe[nrow(resultsDataframe) + 1,] = c(mean(as.numeric(iterationResultsDataframe$accuracy)), mean(as.numeric(iterationResultsDataframe$specificity)), k, paste(columnCombinationsMatrix[,j], collapse = " "))
     }
   }
-  fileLocation = paste("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Combinations2/Results", i, ".csv", sep="")
+  fileLocation = paste("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Combinations3/Results", i, ".csv", sep="")
   write.csv(resultsDataframe, fileLocation, row.names = TRUE)
 }
 
@@ -128,7 +128,10 @@ testAttritionTurnoverDataframe
 ```
 
 ```{r}
+#turnoverDataframe
 
+grep("Age", colnames(turnoverDataframe))
+colnames(turnoverDataframe)
 ```
 
 ```{r}

@@ -1,0 +1,8 @@
+Combine No attrition test set with the training set when predicting monthly income with regression
+Maybe use CaseStudy2CompSet_No_Salary.xlsx
+
+Residual standard error RMSE
+
+When creating a linear regression model in R, we get a Residual standard error when predicting
+
+Monthly Income, JobLevel, Overtime
