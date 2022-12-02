@@ -41,10 +41,10 @@ knnResults5$meanAccuracySpecificity = (knnResults5$accuracy + knnResults5$specif
 knnResults5$knnCombinationSize = 5
 
 #Print out best mean accuracy for all Knn results
-knnResults2[order(-knnResults2$meanAccuracySpecificity),]
-knnResults3[order(-knnResults3$meanAccuracySpecificity),]
-knnResults4[order(-knnResults4$meanAccuracySpecificity),]
-knnResults5[order(-knnResults5$meanAccuracySpecificity),]
+knnResults2 = knnResults2[order(-knnResults2$meanAccuracySpecificity),]
+knnResults3 = knnResults3[order(-knnResults3$meanAccuracySpecificity),]
+knnResults4 = knnResults4[order(-knnResults4$meanAccuracySpecificity),]
+knnResults5 = knnResults5[order(-knnResults5$meanAccuracySpecificity),]
 ```
 
 ```{r}
@@ -57,33 +57,56 @@ naiveBayesResults3$knnCombinationSize = 3
 naiveBayesResults4$meanAccuracySpecificity = (naiveBayesResults4$accuracy + naiveBayesResults4$specificity) / 2
 naiveBayesResults4$knnCombinationSize = 4
 
-naiveBayesResults2[order(-naiveBayesResults2$meanAccuracySpecificity),]
-naiveBayesResults3[order(-naiveBayesResults3$meanAccuracySpecificity),]
-naiveBayesResults4[order(-naiveBayesResults4$meanAccuracySpecificity),]
+naiveBayesResults2 = naiveBayesResults2[order(-naiveBayesResults2$meanAccuracySpecificity),]
+naiveBayesResults3 = naiveBayesResults3[order(-naiveBayesResults3$meanAccuracySpecificity),]
+naiveBayesResults4 = naiveBayesResults4[order(-naiveBayesResults4$meanAccuracySpecificity),]
 ```
 
 ```{r}
+knnResults2
+knnResults3
+knnResults4
+knnResults5
 
+naiveBayesResults2
+naiveBayesResults3
+naiveBayesResults4
 ```
 
 ```{r}
+#Append the top 25 best performing combinations for combinations of 2 through 5
+top25KnnCombinations = knnResults2[1:25, 5]
+top25KnnCombinations = append(top25Combinations, knnResults3[1:25, 5])
+top25KnnCombinations = append(top25Combinations, knnResults4[1:25, 5])
+top25KnnCombinations = append(top25Combinations, knnResults5[1:25, 5])
 
+top25KnnCombinations
 ```
 
 ```{r}
-
+variableFrequencyVectorKnn = c()
+for(i in 1:length(top25KnnCombinations)){
+  variableFrequencyVectorKnn = append(variableFrequencyVectorKnn, str_split(top25KnnCombinations[i], " ")[[1]])
+}
+table(variableFrequencyVectorKnn)
 ```
 
 ```{r}
+#Append the top 25 best performing combinations for combinations of 2 through 5
+top25NaiveBayesCombinations = c()
+top25NaiveBayesCombinations = naiveBayesResults2[1:25, 4]
+top25NaiveBayesCombinations = append(top25Combinations, naiveBayesResults3[1:25, 4])
+top25NaiveBayesCombinations = append(top25Combinations, naiveBayesResults4[1:25, 4])
 
+top25NaiveBayesCombinations
 ```
 
 ```{r}
-
-```
-
-```{r}
-
+variableFrequencyVectorNaiveBayes = c()
+for(i in 1:length(top25KnnCombinations)){
+  variableFrequencyVectorNaiveBayes = append(variableFrequencyVectorNaiveBayes, str_split(top25KnnCombinations[i], " ")[[1]])
+}
+table(variableFrequencyVectorNaiveBayes)
 ```
 
 ```{r}
