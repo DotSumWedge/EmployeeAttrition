@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+library(ggplot2)
 knnResults2 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Combinations2/Results2.csv"))
 knnResults3 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Combinations2/Results3.csv"))
 knnResults4 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Combinations2/Results4.csv"))
@@ -88,7 +89,12 @@ variableFrequencyVectorKnn = c()
 for(i in 1:length(top25KnnCombinations)){
   variableFrequencyVectorKnn = append(variableFrequencyVectorKnn, str_split(top25KnnCombinations[i], " ")[[1]])
 }
-table(variableFrequencyVectorKnn)
+
+KnnResultsDataframe = as.data.frame(table(variableFrequencyVectorKnn))
+KnnResultsDataframe
+
+ggplot(KnnResultsDataframe, aes(x=variableFrequencyVectorKnn, y = Freq)) + 
+    geom_bar(stat="identity")
 ```
 
 ```{r}
@@ -106,7 +112,11 @@ variableFrequencyVectorNaiveBayes = c()
 for(i in 1:length(top25KnnCombinations)){
   variableFrequencyVectorNaiveBayes = append(variableFrequencyVectorNaiveBayes, str_split(top25KnnCombinations[i], " ")[[1]])
 }
-table(variableFrequencyVectorNaiveBayes)
+NaiveBayesResultsDataframe = as.data.frame(table(variableFrequencyVectorNaiveBayes))
+NaiveBayesResultsDataframe
+
+ggplot(NaiveBayesResultsDataframe, aes(x=variableFrequencyVectorNaiveBayes, y = Freq)) + 
+    geom_bar(stat="identity")
 ```
 
 ```{r}
