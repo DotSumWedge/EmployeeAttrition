@@ -1,0 +1,203 @@
+---
+title: "EmployeeDataEDA"
+author: "DerekRogers"
+date: "2022-12-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Loading Data From S3 URL Using RCurl
+```{r}
+library("RCurl") 
+library(jsonlite)
+library(ggplot2)
+library(class)
+library(caret)
+library(e1071)
+library(dplyr)
+library(tidyverse)
+library(aws.s3)
+library(gtools)
+
+creativity <- read.table(textConnection(getURL(
+  "https://smuds6306.s3.us-east-2.amazonaws.com/Creativity.csv"
+)), sep=",", header=TRUE)
+
+iris3 <- jsonlite::fromJSON("https://smuds6306.s3.us-east-2.amazonaws.com/iris.json")
+
+climate <- read.table(textConnection(getURL(
+  "https://cgiardata.s3-us-west-2.amazonaws.com/ccafs/amzn.csv"
+)), sep=",", header=TRUE)
+```
+           
+```{r}
+Sys.setenv("AWS_ACCESS_KEY_ID" = "AKIAVW4VHW4VPB7MHZWA",
+           "AWS_SECRET_ACCESS_KEY" = "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",
+           "AWS_DEFAULT_REGION" = "us-east-2")
+```
+
+```{r}
+# Using aws.s3
+aws.s3::bucketlist()
+aws.s3::get_bucket("smuddsproject2")
+
+#Read in Creativity.csv
+turnoverDataframe = s3read_using(FUN = read.csv,
+                    bucket = "smuddsproject2",
+                    object = "CaseStudy2-data.csv")
+
+testAttritionTurnoverDataframe = s3read_using(FUN = read.csv,
+                    bucket = "smuddsproject2",
+                    object = "CaseStudy2CompSet No Attrition.csv")
+
+turnoverDataframe$Attrition = as.factor(turnoverDataframe$Attrition)
+```
+
+```{r}
+# Remove columns with no unique values: Over18, EmployeeCount, StandardHours
+# Remove employee number as it is only used as a unique identifier and not useful for attrition analysis
+dropColumns = c("Over18", "StandardHours", "EmployeeCount", "EmployeeNumber")
+turnoverDataframe = turnoverDataframe[ , !(names(turnoverDataframe) %in% dropColumns)]
+```
+
+```{r}
+# Reorder so Attrition is the first column, ID is the second column, and Age is the 3rd column
+# Only keep numeric columns
+turnoverDataframe = turnoverDataframe[,c(3,1,2,5,7,8,10,12,13,14,16,18,19,20,22,23,24,25,26,27,28,29,30,31,32)]
+
+apply(turnoverDataframe, 2, function(x) length(unique(x)))
+ncol(turnoverDataframe)
+```
+
+```{r}
+ncol(turnoverDataframe)
+turnoverDataframe$LogMonthlyIncome = log(turnoverDataframe$MonthlyIncome)
+turnoverDataframe$LogMonthlyRate = log(turnoverDataframe$MonthlyRate)
+turnoverDataframe$LogDailyRate = log(turnoverDataframe$DailyRate)
+turnoverDataframe$LogHourlyRate = log(turnoverDataframe$HourlyRate)
+turnoverDataframe$LogDistanceFromHome = log(turnoverDataframe$DistanceFromHome)
+turnoverDataframe
+```
+
+```{r}
+# Monthly income shows a right skew. applying a log transformation improves the evidence for normality for the boxplot and QQ plot but the histogram still shows a right skew
+
+# Histogram
+hist(turnoverDataframe$MonthlyIncome, xlab='Monthly Income (dollars)', main='Histogram of Monthly Income')
+
+# Box plot
+boxplot(turnoverDataframe$MonthlyIncome, xlab = "Monthing Income", ylab = "Dollars", main = "Boxplot of Monthly Income")
+
+# QQ plot
+qqnorm(turnoverDataframe$MonthlyIncome, pch = 1, frame = FALSE, main = "Q-Q Plot  of Monthly Income", ylab = "Dollars")
+qqline(turnoverDataframe$MonthlyIncome, col = "steelblue", lwd = 2)
+
+# Histogram
+hist(turnoverDataframe$LogMonthlyIncome, xlab='log(Monthly Income)', main='Histogram of log monthly income')
+
+# Box plot
+boxplot(turnoverDataframe$LogMonthlyIncome, xlab = "Monthly Income dollars", ylab = "log(dollars)", main = "Boxplot of Log Monthly Income")
+
+# QQ plot
+qqnorm(turnoverDataframe$LogMonthlyIncome, pch = 1, frame = FALSE, main = "Q-Q Plot for Log Monthly Income", ylab = "Monthly Income in log(dollars)")
+qqline(turnoverDataframe$LogMonthlyIncome, col = "steelblue", lwd = 2)
+```
+
+```{r}
+# log transformation doesn't seem appropiate
+
+# Histogram
+hist(turnoverDataframe$MonthlyRate, xlab='Monthly Rate (dollars)', main='Histogram of Monthly Rate')
+
+# Box plot
+boxplot(turnoverDataframe$MonthlyRate, xlab = "Monthing Rate", ylab = "Dollars", main = "Boxplot of Monthly Rate")
+
+# QQ plot
+qqnorm(turnoverDataframe$MonthlyRate, pch = 1, frame = FALSE, main = "Q-Q Plot  of Monthly Rate", ylab = "Dollars")
+qqline(turnoverDataframe$MonthlyRate, col = "steelblue", lwd = 2)
+
+# Histogram
+hist(turnoverDataframe$LogMonthlyRate, xlab='log(Monthly Rate)', main='Histogram of log monthly income')
+
+# Box plot
+boxplot(turnoverDataframe$LogMonthlyRate, xlab = "Monthly Rate dollars", ylab = "log(dollars)", main = "Boxplot of Log Monthly Rate")
+
+# QQ plot
+qqnorm(turnoverDataframe$LogMonthlyRate, pch = 1, frame = FALSE, main = "Q-Q Plot for Log Monthly Rate", ylab = "Monthly Rate in log(dollars)")
+qqline(turnoverDataframe$LogMonthlyRate, col = "steelblue", lwd = 2)
+```
+
+```{r}
+# log transformation doesn't seem appropiate
+
+# Histogram
+hist(turnoverDataframe$DailyRate, xlab='Daily Rate (dollars???)', main='Histogram of Daily Rate')
+
+# Box plot
+boxplot(turnoverDataframe$DailyRate, xlab = "Monthing Rate", ylab = "Dollars", main = "Boxplot of Daily Rate")
+
+# QQ plot
+qqnorm(turnoverDataframe$DailyRate, pch = 1, frame = FALSE, main = "Q-Q Plot  of Daily Rate", ylab = "Dollars???")
+qqline(turnoverDataframe$DailyRate, col = "steelblue", lwd = 2)
+
+# Histogram
+hist(turnoverDataframe$LogDailyRate, xlab='log(Daily Rate)', main='Histogram of log Daily income')
+
+# Box plot
+boxplot(turnoverDataframe$LogDailyRate, xlab = "Daily Rate dollars", ylab = "log(dollars???)", main = "Boxplot of Log Daily Rate")
+
+# QQ plot
+qqnorm(turnoverDataframe$LogDailyRate, pch = 1, frame = FALSE, main = "Q-Q Plot for Log Daily Rate", ylab = "Daily Rate in log(dollars)")
+qqline(turnoverDataframe$LogDailyRate, col = "steelblue", lwd = 2)
+```
+
+```{r}
+# log transformation doesn't seem appropiate
+
+# Histogram
+hist(turnoverDataframe$HourlyRate, xlab='Hourly Rate (dollars)', main='Histogram of Hourly Rate')
+
+# Box plot
+boxplot(turnoverDataframe$HourlyRate, xlab = "Hourly Rate", ylab = "Dollars", main = "Boxplot of Hourly Rate")
+
+# QQ plot
+qqnorm(turnoverDataframe$HourlyRate, pch = 1, frame = FALSE, main = "Q-Q Plot  of Hourly Rate", ylab = "Dollars")
+qqline(turnoverDataframe$HourlyRate, col = "steelblue", lwd = 2)
+
+# Histogram
+hist(turnoverDataframe$LogHourlyRate, xlab='log(Hourly Rate)', main='Histogram of log Hourly Rate')
+
+# Box plot
+boxplot(turnoverDataframe$LogHourlyRate, xlab = "Hourly Rate dollars", ylab = "log(dollars)", main = "Boxplot of Log Hourly Rate")
+
+# QQ plot
+qqnorm(turnoverDataframe$LogHourlyRate, pch = 1, frame = FALSE, main = "Q-Q Plot for Log Hourly Rate", ylab = "Hourly Rate in log(dollars)")
+qqline(turnoverDataframe$LogHourlyRate, col = "steelblue", lwd = 2)
+```
+
+```{r}
+# log transformation doesn't seem appropiate
+
+# Histogram
+hist(turnoverDataframe$DistanceFromHome, xlab='Distance From Home', main='Histogram of Distance From Home')
+
+# Box plot
+boxplot(turnoverDataframe$DistanceFromHome, xlab = "DistanceFromHome", ylab = "??", main = "Boxplot of Distance From Home")
+
+# QQ plot
+qqnorm(turnoverDataframe$DistanceFromHome, pch = 1, frame = FALSE, main = "Q-Q Plot  of Distance From Home", ylab = "???")
+qqline(turnoverDataframe$DistanceFromHome, col = "steelblue", lwd = 2)
+
+# Histogram
+hist(turnoverDataframe$LogDistanceFromHome, xlab='log(Distance From Home)', main='Histogram of log Distance From Home')
+
+# Box plot
+boxplot(turnoverDataframe$LogDistanceFromHome, xlab = "Distance From Home", ylab = "log(???)", main = "Boxplot of Log Distance From Home")
+
+# QQ plot
+qqnorm(turnoverDataframe$LogDistanceFromHome, pch = 1, frame = FALSE, main = "Q-Q Plot for Log Distance From Home", ylab = "Distance From Home in log(dollars)")
+qqline(turnoverDataframe$LogDistanceFromHome, col = "steelblue", lwd = 2)
+```
