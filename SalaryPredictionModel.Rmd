@@ -53,6 +53,10 @@ testAttritionTurnoverDataframe = s3read_using(FUN = read.csv,
                     bucket = "smuddsproject2",
                     object = "CaseStudy2CompSet No Attrition.csv")
 
+testSalaryDataframe =  s3read_using(FUN = read.csv,
+                    bucket = "smuddsproject2",
+                    object = "CaseStudy2CompSet No Salary.csv")
+
 turnoverDataframe$Attrition = as.factor(turnoverDataframe$Attrition)
 ```
 
@@ -76,4 +80,47 @@ ncol(turnoverDataframe)
 ncol(turnoverDataframe)
 turnoverDataframe$LogMonthlyIncome = log(turnoverDataframe$MonthlyIncome)
 turnoverDataframe
+```
+
+```{r}
+#Columns that probably predict salary:
+# Education
+# HourlyRate
+# JobInvolvement
+# JobLevel
+# MonthlyRate
+# PercentSalaryHike
+# PerformanceRating
+# StockOptionLevel
+# ??? YearsAtCompany - YearsSinceLastPromotion
+```
+
+```{r}
+model = lm(LogMonthlyIncome~JobInvolvement+JobLevel, turnoverDataframe)
+
+summary(model)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
 ```
