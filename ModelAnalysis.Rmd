@@ -93,7 +93,7 @@ for(i in 1:length(top25KnnCombinations)){
 KnnResultsDataframe = as.data.frame(table(variableFrequencyVectorKnn))
 KnnResultsDataframe
 
-ggplot(KnnResultsDataframe, aes(x=variableFrequencyVectorKnn, y = Freq)) + 
+ggplot(KnnResultsDataframe, aes(x=reorder(variableFrequencyVectorKnn, -Freq), y = Freq)) + 
     geom_bar(stat="identity")
 ```
 
@@ -115,7 +115,7 @@ for(i in 1:length(top25KnnCombinations)){
 NaiveBayesResultsDataframe = as.data.frame(table(variableFrequencyVectorNaiveBayes))
 NaiveBayesResultsDataframe
 
-ggplot(NaiveBayesResultsDataframe, aes(x=variableFrequencyVectorNaiveBayes, y = Freq)) + 
+ggplot(NaiveBayesResultsDataframe, aes(x=reorder(variableFrequencyVectorNaiveBayes, -Freq), y = Freq)) + 
     geom_bar(stat="identity")
 ```
 
