@@ -11,6 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(ggplot2)
+library(plyr)
+
 knnResults2 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Combinations2/Results2.csv"))
 knnResults3 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Combinations2/Results3.csv"))
 knnResults4 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Combinations2/Results4.csv"))
@@ -80,8 +82,6 @@ top25KnnCombinations = knnResults2[1:25, 5]
 top25KnnCombinations = append(top25Combinations, knnResults3[1:25, 5])
 top25KnnCombinations = append(top25Combinations, knnResults4[1:25, 5])
 top25KnnCombinations = append(top25Combinations, knnResults5[1:25, 5])
-
-top25KnnCombinations
 ```
 
 ```{r}
@@ -91,10 +91,18 @@ for(i in 1:length(top25KnnCombinations)){
 }
 
 KnnResultsDataframe = as.data.frame(table(variableFrequencyVectorKnn))
+KnnResultsDataframe$variableNames = mapvalues(KnnResultsDataframe$variableFrequencyVectorKnn,
+                                              from = c("6","7","9","10","11","14","16","17","18","20","21","23","24","25","26"),
+                                              to = c("Education","Env Satisfaction","Job Involvement","Job Level","Job Satisfaction","Num Comp Worked","Performance Rating","Relat Satisfaction","Stock Option", "Training Times","Work Life Balance", "Years Cur Role", "Years Last Promo", "Years W/ Curr Manager", "Log(Monthly Income)"))
+
 KnnResultsDataframe
 
-ggplot(KnnResultsDataframe, aes(x=reorder(variableFrequencyVectorKnn, -Freq), y = Freq)) + 
-    geom_bar(stat="identity")
+ggplot(KnnResultsDataframe, aes(x=reorder(variableNames, -Freq), y = Freq)) + 
+    geom_bar(stat="identity") +
+    theme(axis.text.x = element_text(size = rel(2), angle = 90, vjust = .5)) +
+    labs(title="Frequency of variables in top performing knn models", 
+      y="Frequency", 
+      x="Variable Name")
 ```
 
 ```{r}
@@ -103,8 +111,6 @@ top25NaiveBayesCombinations = c()
 top25NaiveBayesCombinations = naiveBayesResults2[1:25, 4]
 top25NaiveBayesCombinations = append(top25Combinations, naiveBayesResults3[1:25, 4])
 top25NaiveBayesCombinations = append(top25Combinations, naiveBayesResults4[1:25, 4])
-
-top25NaiveBayesCombinations
 ```
 
 ```{r}
@@ -113,10 +119,20 @@ for(i in 1:length(top25KnnCombinations)){
   variableFrequencyVectorNaiveBayes = append(variableFrequencyVectorNaiveBayes, str_split(top25KnnCombinations[i], " ")[[1]])
 }
 NaiveBayesResultsDataframe = as.data.frame(table(variableFrequencyVectorNaiveBayes))
+
+# 6, 7, 9, 10, 11, 14, 16, 17, 18, 20, 21, 23, 24, 25, 26
+NaiveBayesResultsDataframe$variableNames = mapvalues(NaiveBayesResultsDataframe$variableFrequencyVectorNaiveBayes,
+                                              from = c("6","7","9","10","11","14","16","17","18","20","21","23","24","25","26"),
+                                              to = c("Education","Env Satisfaction","Job Involvement","Job Level","Job Satisfaction","Num Comp Worked","Performance Rating","Relat Satisfaction","Stock Option", "Training Times","Work Life Balance", "Years Cur Role", "Years Last Promo", "Years W/ Curr Manager", "Log(Monthly Income)"))
+
 NaiveBayesResultsDataframe
 
-ggplot(NaiveBayesResultsDataframe, aes(x=reorder(variableFrequencyVectorNaiveBayes, -Freq), y = Freq)) + 
-    geom_bar(stat="identity")
+ggplot(NaiveBayesResultsDataframe, aes(x=reorder(variableNames, -Freq), y = Freq)) + 
+    geom_bar(stat="identity") +
+    theme(axis.text.x = element_text(size = rel(2), angle = 90, vjust = .5)) +
+    labs(title="Frequency of variables in top performing naive bayes models", 
+       y="Frequency", 
+       x="Variable Name")
 ```
 
 ```{r}
