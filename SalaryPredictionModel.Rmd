@@ -55,9 +55,10 @@ testAttritionTurnoverDataframe = s3read_using(FUN = read.csv,
 
 testSalaryDataframe =  s3read_using(FUN = read.csv,
                     bucket = "smuddsproject2",
-                    object = "CaseStudy2CompSet No Salary.csv")
+                    object = "CaseStudy2CompSet No Salary.xlsx")
 
 turnoverDataframe$Attrition = as.factor(turnoverDataframe$Attrition)
+testSalaryDataframe
 ```
 
 ```{r}
@@ -96,7 +97,7 @@ turnoverDataframe
 ```
 
 ```{r}
-model = lm(LogMonthlyIncome~JobInvolvement+JobLevel, turnoverDataframe)
+model = lm(LogMonthlyIncome~Education+JobInvolvement+JobLevel, turnoverDataframe)
 
 summary(model)
 ```
