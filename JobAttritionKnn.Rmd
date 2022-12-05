@@ -79,7 +79,7 @@ turnoverDataframe
 ```
 
 ```{r}
-trainingPercent = numberOfYesObservations / numberOfNoObservations
+trainingPercent = nrow(yesAttritionTrainingDataframe) / nrow(noAttritionTrainingDataframe)
 
 #Seperate the yes/no attrition observations into 2 dataframes
 noAttritionTrainingDataframe = turnoverDataframe[turnoverDataframe$Attrition == 'No',]
@@ -111,7 +111,7 @@ for(i in 1:length(columnCombinations)){
       resultsDataframe[nrow(resultsDataframe) + 1,] = c(mean(as.numeric(iterationResultsDataframe$accuracy)), mean(as.numeric(iterationResultsDataframe$specificity)), k, paste(columnCombinationsMatrix[,j], collapse = " "))
     }
   }
-  fileLocation = paste("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/KnnResults/Combinations3/Results", i, ".csv", sep="")
+  fileLocation = paste("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/EDAModelResults/KnnResults/Results4/Results", i, ".csv", sep="")
   write.csv(resultsDataframe, fileLocation, row.names = TRUE)
 }
 
@@ -135,7 +135,7 @@ colnames(turnoverDataframe)
 ```
 
 ```{r}
-
+dim(noAttritionTrainingDataframe)[1]
 ```
 
 ```{r}
