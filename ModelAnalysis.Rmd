@@ -115,8 +115,8 @@ top25NaiveBayesCombinations = append(top25Combinations, naiveBayesResults4[1:25,
 
 ```{r}
 variableFrequencyVectorNaiveBayes = c()
-for(i in 1:length(top25KnnCombinations)){
-  variableFrequencyVectorNaiveBayes = append(variableFrequencyVectorNaiveBayes, str_split(top25KnnCombinations[i], " ")[[1]])
+for(i in 1:length(top25NaiveBayesCombinations)){
+  variableFrequencyVectorNaiveBayes = append(variableFrequencyVectorNaiveBayes, str_split(top25NaiveBayesCombinations[i], " ")[[1]])
 }
 NaiveBayesResultsDataframe = as.data.frame(table(variableFrequencyVectorNaiveBayes))
 
