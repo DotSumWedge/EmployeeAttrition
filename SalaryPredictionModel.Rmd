@@ -57,7 +57,10 @@ testSalaryDataframe =  s3read_using(FUN = read.csv,
                     bucket = "smuddsproject2",
                     object = "CaseStudy2CompSet No Salary.xlsx")
 
+noSalaryDataframeCSV = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/CaseStudy2CompSet_No_Salary.csv"))
+
 turnoverDataframe$Attrition = as.factor(turnoverDataframe$Attrition)
+turnoverDataframe$JobLevel = as.factor(turnoverDataframe$JobLevel)
 testSalaryDataframe
 ```
 
@@ -97,21 +100,42 @@ turnoverDataframe
 ```
 
 ```{r}
-model = lm(LogMonthlyIncome~Education+JobInvolvement+JobLevel, turnoverDataframe)
+model = lm(LogMonthlyIncome~JobLevel, turnoverDataframe)
 
 summary(model)
 ```
 
 ```{r}
-
+turnoverDataframe %>% ggplot(aes(x = JobLevel, y = MonthlyIncome, color = JobLevel)) + 
+  geom_point() +
+  labs(title="Monthly Income by Job Level")
 ```
 
 ```{r}
-
+turnoverDataframe %>% ggplot(aes(x=JobLevel, y=MonthlyIncome, color = JobLevel)) + 
+  geom_boxplot() + 
+  labs(y="Monthly Income", 
+       x="Job Level", 
+       title="Monthly Income by Job Level")
 ```
 
 ```{r}
+noSalaryDataframeCSV
+noSalaryDataframeCSV$JobLevel = as.factor(noSalaryDataframeCSV$JobLevel)
 
+predMonthlyIncomes = predict(model, newdata = noSalaryDataframeCSV)
+
+pred_df = as.data.frame(predMonthlyIncomes,noSalaryDataframeCSV)
+pred_df$ID = noSalaryDataframeCSV[,1]
+pred_df$finalMonthlyIncomePrediction = exp(pred_df$predMonthlyIncomes)
+
+dropColumns = c("predMonthlyIncomes")
+pred_df = pred_df[ , !(names(pred_df) %in% dropColumns)]
+
+fileLocation = paste("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/Predictions/SalaryPrediction.csv", sep="")
+write.csv(pred_df, fileLocation, row.names = TRUE)
+
+pred_df
 ```
 
 ```{r}
