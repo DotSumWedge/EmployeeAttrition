@@ -1,0 +1,159 @@
+---
+title: "ModelAnalysis2"
+author: "Derek Rogers"
+date: "2022-12-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(plyr)
+
+knnResults2 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/SecondaryModelResults/KnnResults/Results1/Results2.csv"))
+knnResults3 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/SecondaryModelResults/KnnResults/Results1/Results3.csv"))
+knnResults4 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/SecondaryModelResults/KnnResults/Results1/Results4.csv"))
+knnResults5 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/SecondaryModelResults/KnnResults/Results1/Results5.csv"))
+knnResults6 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/SecondaryModelResults/KnnResults/Results1/Results6.csv"))
+```
+
+```{r}
+naiveBayesResults2 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/SecondaryModelResults/NaiveBayesResults/Results1/Results2.csv"))
+naiveBayesResults3 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/SecondaryModelResults/NaiveBayesResults/Results1/Results3.csv"))
+naiveBayesResults4 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/SecondaryModelResults/NaiveBayesResults/Results1/Results4.csv"))
+naiveBayesResults5 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/SecondaryModelResults/NaiveBayesResults/Results1/Results5.csv"))
+naiveBayesResults6 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/SecondaryModelResults/NaiveBayesResults/Results1/Results6.csv"))
+```
+
+```{r}
+knnResults2$meanSensitivitySpecificity = (knnResults2$sensitivity + knnResults2$specificity) / 2
+knnResults2$knnCombinationSize = 2
+
+knnResults3$meanSensitivitySpecificity = (knnResults3$sensitivity + knnResults3$specificity) / 2
+knnResults3$knnCombinationSize = 3
+
+knnResults4$meanSensitivitySpecificity = (knnResults4$sensitivity + knnResults4$specificity) / 2
+knnResults4$knnCombinationSize = 4
+
+knnResults5$meanSensitivitySpecificity = (knnResults5$sensitivity + knnResults5$specificity) / 2
+knnResults5$knnCombinationSize = 5
+
+knnResults6$meanSensitivitySpecificity = (knnResults6$sensitivity + knnResults6$specificity) / 2
+knnResults6$knnCombinationSize = 6
+
+#Print out best mean accuracy for all Knn results
+knnResults2 = knnResults2[order(-knnResults2$meanSensitivitySpecificity),]
+knnResults3 = knnResults3[order(-knnResults3$meanSensitivitySpecificity),]
+knnResults4 = knnResults4[order(-knnResults4$meanSensitivitySpecificity),]
+knnResults5 = knnResults5[order(-knnResults5$meanSensitivitySpecificity),]
+knnResults6 = knnResults6[order(-knnResults6$meanSensitivitySpecificity),]
+```
+
+```{r}
+naiveBayesResults2$meanSensitivitySpecificity = (naiveBayesResults2$sensitivity + naiveBayesResults2$specificity) / 2
+naiveBayesResults2$CombinationSize = 2
+
+naiveBayesResults3$meanSensitivitySpecificity = (naiveBayesResults3$sensitivity + naiveBayesResults3$specificity) / 2
+naiveBayesResults3$CombinationSize = 3
+
+naiveBayesResults4$meanSensitivitySpecificity = (naiveBayesResults4$sensitivity + naiveBayesResults4$specificity) / 2
+naiveBayesResults4$CombinationSize = 4
+
+naiveBayesResults5$meanSensitivitySpecificity = (naiveBayesResults5$sensitivity + naiveBayesResults5$specificity) / 2
+naiveBayesResults5$CombinationSize = 5
+
+naiveBayesResults6$meanSensitivitySpecificity = (naiveBayesResults6$sensitivity + naiveBayesResults6$specificity) / 2
+naiveBayesResults6$CombinationSize = 6
+
+naiveBayesResults2 = naiveBayesResults2[order(-naiveBayesResults2$meanSensitivitySpecificity),]
+naiveBayesResults3 = naiveBayesResults3[order(-naiveBayesResults3$meanSensitivitySpecificity),]
+naiveBayesResults4 = naiveBayesResults4[order(-naiveBayesResults4$meanSensitivitySpecificity),]
+naiveBayesResults5 = naiveBayesResults5[order(-naiveBayesResults5$meanSensitivitySpecificity),]
+naiveBayesResults6 = naiveBayesResults6[order(-naiveBayesResults6$meanSensitivitySpecificity),]
+```
+
+```{r}
+knnResults2
+knnResults3
+knnResults4
+knnResults5
+knnResults6
+
+naiveBayesResults2
+naiveBayesResults3
+naiveBayesResults4
+naiveBayesResults5
+naiveBayesResults6
+```
+
+```{r}
+#Append the top 25 best performing combinations for combinations of 2 through 5
+top25KnnCombinations = knnResults2[1:25, 5]
+top25KnnCombinations = append(top25KnnCombinations, knnResults3[1:25, 5])
+top25KnnCombinations = append(top25KnnCombinations, knnResults4[1:25, 5])
+top25KnnCombinations = append(top25KnnCombinations, knnResults5[1:25, 5])
+top25KnnCombinations = append(top25KnnCombinations, knnResults6[1:25, 5])
+```
+
+```{r}
+variableFrequencyVectorKnn = c()
+for(i in 1:length(top25KnnCombinations)){
+  variableFrequencyVectorKnn = append(variableFrequencyVectorKnn, str_split(top25KnnCombinations[i], " ")[[1]])
+}
+
+KnnResultsDataframe = as.data.frame(table(variableFrequencyVectorKnn))
+KnnResultsDataframe$variableNames = mapvalues(KnnResultsDataframe$variableFrequencyVectorKnn,
+                                              from = c("2","3","4","5","6","7","8","9"),
+                                              to = c("JobInvolvement","JobLevel","JobSatisfaction","PerformanceRating","StockOptionLevel","TotalWorkingYears","WorkLifeBalance","BusinessTravelNumeric"))
+
+KnnResultsDataframe = KnnResultsDataframe[order(-KnnResultsDataframe$Freq),]
+
+ggplot(KnnResultsDataframe, aes(x=reorder(variableNames, -Freq), y = Freq)) + 
+    geom_bar(stat="identity") +
+    theme(axis.text.x = element_text(size = rel(2), angle = 90, vjust = .5)) +
+    labs(title="Frequency of variables in top performing knn models", 
+      y="Frequency",
+      x="")
+```
+
+```{r}
+#Append the top 25 best performing combinations for combinations of 2 through 5
+top25NaiveBayesCombinations = c()
+top25NaiveBayesCombinations = naiveBayesResults2[1:25, 4]
+top25NaiveBayesCombinations = append(top25NaiveBayesCombinations, naiveBayesResults3[1:25, 4])
+top25NaiveBayesCombinations = append(top25NaiveBayesCombinations, naiveBayesResults4[1:25, 4])
+top25NaiveBayesCombinations = append(top25NaiveBayesCombinations, naiveBayesResults5[1:25, 4])
+top25NaiveBayesCombinations = append(top25NaiveBayesCombinations, naiveBayesResults6[1:25, 4])
+```
+
+```{r}
+variableFrequencyVectorNaiveBayes = c()
+for(i in 1:length(top25NaiveBayesCombinations)){
+  variableFrequencyVectorNaiveBayes = append(variableFrequencyVectorNaiveBayes, str_split(top25NaiveBayesCombinations[i], " ")[[1]])
+}
+NaiveBayesResultsDataframe = as.data.frame(table(variableFrequencyVectorNaiveBayes))
+
+NaiveBayesResultsDataframe$variableNames = mapvalues(NaiveBayesResultsDataframe$variableFrequencyVectorNaiveBayes,
+                                              from = c("2","3","4","5","6","7","8","9"),
+                                              to = c("JobInvolvement","JobLevel","JobSatisfaction","PerformanceRating","StockOptionLevel","TotalWorkingYears","WorkLifeBalance","BusinessTravelNumeric"))
+
+NaiveBayesResultsDataframe = NaiveBayesResultsDataframe[order(-NaiveBayesResultsDataframe$Freq),]
+
+ggplot(NaiveBayesResultsDataframe, aes(x=reorder(variableNames, -Freq), y = Freq)) + 
+    geom_bar(stat="identity") +
+    theme(axis.text.x = element_text(size = rel(2), angle = 90, vjust = .5)) +
+    labs(title="Frequency of variables in top performing naive bayes models", 
+       y="Frequency",
+       x="")
+```
+
+```{r}
+# Take top 4 variables from Naive Bayes, create a model with all the data, and run prediction
+```
+
+```{r}
+
+```
