@@ -1,0 +1,13 @@
+name: EmployeeAttritionApp
+title: EmployeeAttritionApp
+username:
+account: derekrogers
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7871695
+bundleId: 6625647
+url: https://derekrogers.shinyapps.io/EmployeeAttritionApp/
+when: 1670821622.81623
+lastSyncTime: 1670821622.81623
+asMultiple: FALSE
+asStatic: FALSE
