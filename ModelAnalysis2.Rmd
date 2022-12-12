@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(ggplot2)
 library(plyr)
+library(stringr)
 
 knnResults2 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/SecondaryModelResults/KnnResults/Results1/Results2.csv"))
 knnResults3 = data.frame(read.csv("C:/SMU MS Data Science/DoingDataScience6306/EmployeeAttrition/SecondaryModelResults/KnnResults/Results1/Results3.csv"))
@@ -107,7 +108,7 @@ for(i in 1:length(top25KnnCombinations)){
 KnnResultsDataframe = as.data.frame(table(variableFrequencyVectorKnn))
 KnnResultsDataframe$variableNames = mapvalues(KnnResultsDataframe$variableFrequencyVectorKnn,
                                               from = c("2","3","4","5","6","7","8","9"),
-                                              to = c("JobInvolvement","JobLevel","JobSatisfaction","PerformanceRating","StockOptionLevel","TotalWorkingYears","WorkLifeBalance","BusinessTravelNumeric"))
+                                              to = c("JobInvolvement","JobLevel","JobSatisfaction","PerformanceRating","StockOptionLevel","TotalWorkingYears","WorkLifeBalance","BusinessTravel"))
 
 KnnResultsDataframe = KnnResultsDataframe[order(-KnnResultsDataframe$Freq),]
 
@@ -138,7 +139,7 @@ NaiveBayesResultsDataframe = as.data.frame(table(variableFrequencyVectorNaiveBay
 
 NaiveBayesResultsDataframe$variableNames = mapvalues(NaiveBayesResultsDataframe$variableFrequencyVectorNaiveBayes,
                                               from = c("2","3","4","5","6","7","8","9"),
-                                              to = c("JobInvolvement","JobLevel","JobSatisfaction","PerformanceRating","StockOptionLevel","TotalWorkingYears","WorkLifeBalance","BusinessTravelNumeric"))
+                                              to = c("JobInvolvement","JobLevel","JobSatisfaction","PerformanceRating","StockOptionLevel","TotalWorkingYears","WorkLifeBalance","BusinessTravel"))
 
 NaiveBayesResultsDataframe = NaiveBayesResultsDataframe[order(-NaiveBayesResultsDataframe$Freq),]
 
